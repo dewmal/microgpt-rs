@@ -8,16 +8,24 @@ use std::{
 
 fn main() {
     load_data();
-    preprocess_data();
+    tokenizer();
 }
 
-fn preprocess_data() {
+fn tokenizer() {
+    let docs = preprocess_data();
+    let BOS = docs.len();
+    let vocab_size = docs.len() + 1;
+    println!("BOS:{BOS},vocab size: {vocab_size}")
+}
+
+fn preprocess_data() -> Vec<String> {
     let data_path = "data.txt";
     let contents = fs::read_to_string(data_path).expect("Cannot read data file");
-    let mut docs: Vec<&str> = contents
+    let mut docs: Vec<String> = contents
         .lines()
         .map(|l| l.trim())
         .filter(|l| !l.is_empty())
+        .map(|l| l.to_string())
         .collect();
     let mut seed = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -35,6 +43,8 @@ fn preprocess_data() {
     }
 
     println!("num docs: {}", docs.len());
+
+    docs
 }
 
 fn load_data() {
@@ -46,8 +56,7 @@ fn load_data() {
         Some(i) => (&without_scheme[..i], &without_scheme[i..]),
         None => (without_scheme.as_str(), "/"),
     };
-    let tcp = TcpStream::connect(format!("{host}:443")).expect("Could not Connl
-        ect to the server");
+    let tcp = TcpStream::connect(format!("{host}:443")).expect("Could not Connect to the server");
 
     let connector = TlsConnector::new().expect("Failed to create TLS connector");
     let mut stream = connector.connect(host, tcp).expect("TLS handshake failed");
