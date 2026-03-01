@@ -1,3 +1,4 @@
+use native_tls::TlsConnector;
 use std::{
     io::{BufRead, BufReader, Read, Write},
     net::TcpStream,
@@ -12,15 +13,18 @@ fn load_data() {
         Some(i) => (&without_scheme[..i], &without_scheme[i..]),
         None => (without_scheme.as_str(), "/"),
     };
-    let mut tcp =
-        TcpStream::connect(format!("{host}:443"))
-            .expect("Could not Connect to the server");
+    let tcp = TcpStream::connect(format!("{host}:443")).expect("Could not Connect to the server");
+
+    let connector = TlsConnector::new().expect("Failed to create TLS connector");
+    let mut stream = connector.connect(host, tcp).expect("TLS handshake failed");
 
     let request = format!("GET {path} HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n");
 
-    tcp.write_all(request.as_bytes()).expect("Failed to send");
+    stream
+        .write_all(request.as_bytes())
+        .expect("Failed to send");
 
-    let mut reader = BufReader::new(tcp);
+    let mut reader = BufReader::new(stream);
 
     let mut line = String::new();
 
