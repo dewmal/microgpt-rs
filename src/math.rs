@@ -1,24 +1,6 @@
 use crate::model::{MatrixView, Model};
 use crate::value::{Value, ValueRef};
 
-pub(crate) fn gaussian(seed: &mut u64, std: f64) -> f64 {
-    *seed ^= *seed << 13;
-    *seed ^= *seed >> 7;
-    *seed ^= *seed << 17;
-    let u1 = (*seed as f64) / (u64::MAX as f64);
-
-    *seed ^= *seed << 13;
-    *seed ^= *seed >> 7;
-    *seed ^= *seed << 17;
-    let u2 = (*seed as f64) / (u64::MAX as f64);
-
-    // Box-Mullar : convert uniform random to Gaussian
-    let u1 = u1.abs().max(1e-10);
-    let normal = (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos();
-
-    normal * std
-}
-
 fn linear_vec(x: &[ValueRef], model: &Model, w: &MatrixView) -> Vec<ValueRef> {
     assert_eq!(x.len(), w.cols);
     let mut out = Vec::with_capacity(w.rows);

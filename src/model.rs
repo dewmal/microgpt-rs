@@ -1,4 +1,4 @@
-use crate::math::gaussian;
+use crate::value::ValueRef;
 pub(crate) struct Param {
     pub(crate) data: f64, // Weight Value
     grad: f64,            // Gradient (Update with backward pass)
@@ -82,4 +82,28 @@ impl Model {
             layers,
         }
     }
+}
+type KV = Vec<Vec<Vec<ValueRef>>>;
+
+pub(crate) fn new_kv(n_layer: usize) -> (KV, KV) {
+    let keys = (0..n_layer).map(|_| Vec::new()).collect();
+    let values = (0..n_layer).map(|_| Vec::new()).collect();
+    (keys, values)
+}
+fn gaussian(seed: &mut u64, std: f64) -> f64 {
+    *seed ^= *seed << 13;
+    *seed ^= *seed >> 7;
+    *seed ^= *seed << 17;
+    let u1 = (*seed as f64) / (u64::MAX as f64);
+
+    *seed ^= *seed << 13;
+    *seed ^= *seed >> 7;
+    *seed ^= *seed << 17;
+    let u2 = (*seed as f64) / (u64::MAX as f64);
+
+    // Box-Mullar : convert uniform random to Gaussian
+    let u1 = u1.abs().max(1e-10);
+    let normal = (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos();
+
+    normal * std
 }
