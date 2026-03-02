@@ -1,21 +1,80 @@
 use native_tls::TlsConnector;
 use std::{
-    fs,
+    f64, fs,
     io::{BufRead, BufReader, Read, Write},
     net::TcpStream,
     time::{SystemTime, UNIX_EPOCH},
 };
+
+use std::cell::RefCell;
+use std::ops::Add;
+use std::rc::Rc;
 
 fn main() {
     load_data();
     tokenizer();
 }
 
+#[derive(Debug)]
+struct ValueRef(Rc<RefCell<Value>>);
+impl ValueRef {
+    fn borrow(&self) -> std::cell::Ref<Value> {
+        self.0.borrow()
+    }
+
+    fn borrow_mut(&self) -> std::cell::RefMut<Value> {
+        self.0.borrow_mut()
+    }
+}
+#[derive(Debug)]
+struct Value {
+    // scalar vlaue
+    data: f64,
+    // dL/d (this)
+    grad: f64,
+    //Graph Structure
+    children: Vec<ValueRef>,
+    // local derivative of this node w.r.t each child
+    local_grads: Vec<f64>,
+}
+
+impl Value {
+    // Create a leaf node (no children)
+    fn leaf(data: f64) -> ValueRef {
+        ValueRef(Rc::new(RefCell::new(Value {
+            data,
+            grad: 0.0,
+            children: vec![],
+            local_grads: vec![],
+        })))
+    }
+
+    // Create a node with given children and local grads
+    fn node(data: f64, children: Vec<ValueRef>, local_grads: Vec<f64>) -> ValueRef {
+        debug_assert_eq!(children.len(), local_grads.len());
+        ValueRef(Rc::new(RefCell::new(Value {
+            data,
+            grad: 0.0,
+            children,
+            local_grads,
+        })))
+    }
+}
+
+impl Add for ValueRef {
+    type Output = ValueRef;
+    fn add(self, other: ValueRef) -> Self::Output {
+        let data = self.borrow().data + other.borrow().data;
+
+        Value::node(data, vec![self, other], vec![1.0, 1.0])
+    }
+}
+
 fn tokenizer() {
     let docs = preprocess_data();
-    let BOS = docs.len();
+    let bos = docs.len();
     let vocab_size = docs.len() + 1;
-    println!("BOS:{BOS},vocab size: {vocab_size}")
+    println!("BOS:{bos},vocab size: {vocab_size}")
 }
 
 fn preprocess_data() -> Vec<String> {
