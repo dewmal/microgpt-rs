@@ -417,15 +417,15 @@ mod test {
 
     #[test]
     fn test_backward_mul() {
-        let x = Value::leaf(2.0);
-        let y = Value::leaf(3.0);
+        let a = Value::leaf(2.0);
+        let b = Value::leaf(3.0);
 
-        let z = &x * &y; // z = x*y
-        z.backward();
+        let c = &a * &b; // 6.0
+        let l = &c + &a; // 8.0
 
-        // dz/dx = y = 3
-        assert!((x.borrow().grad - 3.0).abs() < 1e-9);
-        // dz/dy = x = 2
-        assert!((y.borrow().grad - 2.0).abs() < 1e-9);
+        l.backward();
+
+        assert_eq!(a.borrow().grad, 4.0); // 4.0 (dL/da = b + 1 = 3 + 1, via both paths)
+        assert_eq!(b.borrow().grad, 2.0); // 2.0 (dL/db = a = 2)
     }
 }
