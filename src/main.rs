@@ -16,7 +16,7 @@ fn main() {
     let tokenizer_info = tokenizer::tokenizer();
 
     let vocab_size = tokenizer_info.vocab_size;
-    let block_size = 8;
+    let block_size = 16;
     let n_layer = 1;
     let n_embed = 16;
     let n_head = 4;
