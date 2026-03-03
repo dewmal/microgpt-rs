@@ -25,9 +25,6 @@ pub(crate) fn vadd(a: &[ValueRef], b: &[ValueRef]) -> Vec<ValueRef> {
     assert_eq!(a.len(), b.len());
     a.iter().zip(b).map(|(x, y)| x + y).collect()
 }
-pub(crate) fn vscale(x: &[ValueRef], s: f64) -> Vec<ValueRef> {
-    x.iter().map(|xi| xi * s).collect()
-}
 pub(crate) fn rmsnorm(x: &[ValueRef]) -> Vec<ValueRef> {
     let n = x.len() as f64;
     let mut sq = Vec::with_capacity(x.len());

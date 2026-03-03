@@ -114,15 +114,3 @@ fn gaussian(seed: &mut u64, std: f64) -> f64 {
 
     normal * std
 }
-fn zero_grad(model: &mut Model) {
-    for p in &mut model.params {
-        p.v.borrow_mut().grad = 0.0;
-    }
-}
-
-fn sgd_step(model: &mut Model, lr: f64) {
-    for p in &mut model.params {
-        let mut pb = p.v.borrow_mut();
-        pb.data -= lr * pb.grad;
-    }
-}

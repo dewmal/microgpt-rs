@@ -1,9 +1,7 @@
 use native_tls::TlsConnector;
 use std::{
-    fs,
     io::{BufRead, BufReader, Read, Write},
     net::TcpStream,
-    time::{SystemTime, UNIX_EPOCH},
 };
 
 pub(crate) fn load_data() {

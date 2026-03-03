@@ -2,8 +2,7 @@ use std::f64;
 
 use crate::{
     gpt::{GptConfig, gpt_step},
-    model::{self, Model, new_kv},
-    value,
+    model::{Model, new_kv},
 };
 
 fn xorshift64(seed: &mut u64) -> u64 {

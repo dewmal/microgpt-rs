@@ -50,19 +50,6 @@ impl Value {
             local_grads,
         })))
     }
-    pub(crate) fn powi(x: &ValueRef, n: i32) -> ValueRef {
-        let x_data = x.borrow().data;
-        let data = x_data.powi(n);
-
-        // d(x^n)/dx = n * x^(n-1)
-        let local = if n == 0 {
-            0.0 // derivate of constant 1 wrt x is 0
-        } else {
-            (n as f64) * x_data.powi(n - 1)
-        };
-
-        Value::node(data, vec![ValueRef(Rc::clone(&x.0))], vec![local])
-    }
     pub(crate) fn powf(x: &ValueRef, n: f64) -> ValueRef {
         let x_data = x.borrow().data;
         let data = x_data.powf(n);
