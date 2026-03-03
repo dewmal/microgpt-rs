@@ -264,4 +264,8 @@ end_time = time.perf_counter_ns()
 
 duration_ns = end_time - start_time
 
-print(f"Duration: {duration_ns} ns")
+secs = duration_ns / 1_000_000_000
+millis = duration_ns / 1_000_000
+micros = duration_ns / 1_000
+
+print(f"Duration: {secs:.3f}s / {millis:.1f}ms / {micros:.1f}µs / {duration_ns}ns")

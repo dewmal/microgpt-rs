@@ -56,5 +56,11 @@ fn main() {
         println!("Sample {:2}: {}", i + 1, name);
     }
     let duration = start.elapsed();
-    println!("Duration: {} ns", duration.as_nanos());
+    println!(
+        "Duration: {:.3}s / {}ms / {}µs / {}ns",
+        duration.as_secs_f64(),
+        duration.as_millis(),
+        duration.as_micros(),
+        duration.as_nanos()
+    );
 }
