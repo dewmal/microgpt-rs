@@ -91,6 +91,12 @@ impl Value {
         let local = if x_data > 0.0 { 1.0 } else { 0.0 };
         Value::node(data, vec![ValueRef(Rc::clone(&x.0))], vec![local])
     }
+
+    pub(crate) fn ln(x: &ValueRef) -> ValueRef {
+        let xd = x.borrow().data;
+        let data = xd.ln();
+        Value::node(data, vec![ValueRef(Rc::clone(&x.0))], vec![1.0 / xd])
+    }
 }
 
 impl PartialEq for ValueRef {

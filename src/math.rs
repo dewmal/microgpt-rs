@@ -55,3 +55,14 @@ pub(crate) fn softmax(logits: &[ValueRef]) -> Vec<ValueRef> {
     let denom = vsum(&exps);
     exps.into_iter().map(|e| &e / &denom).collect()
 }
+pub(crate) fn nll_from_logits(logits: &[ValueRef], target: usize) -> ValueRef {
+    // Convert logits → probabilities
+    let probs = softmax(logits);
+
+    // Avoid ln(0)
+    let eps = Value::leaf(1e-12);
+    let p = &probs[target] + &eps;
+
+    // -log(p_target)
+    -&Value::ln(&p)
+}

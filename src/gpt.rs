@@ -4,15 +4,15 @@ use crate::{
     value::{Value, ValueRef},
 };
 
-pub struct GptConfig {
-    vocab_size: usize,
-    block_size: usize,
-    n_layer: usize,
-    n_head: usize,
-    n_embed: usize,
+pub(crate) struct GptConfig {
+    pub(crate) vocab_size: usize,
+    pub(crate) block_size: usize,
+    pub(crate) n_layer: usize,
+    pub(crate) n_head: usize,
+    pub(crate) n_embed: usize,
 }
 
-fn gpt_step(
+pub(crate) fn gpt_step(
     model: &Model,
     cfg: &GptConfig,
     token_id: usize,
@@ -84,7 +84,7 @@ fn gpt_step(
         let x_res = x.clone();
         x = rmsnorm(&x);
 
-        let h = linear_vec(&x, model, &lp.attn_wo);
+        let h = linear_vec(&x, model, &lp.mlp_fc1);
         let h = h.iter().map(|xi| Value::relu(xi)).collect::<Vec<_>>();
         let h2 = linear_vec(&h, model, &lp.mlp_fc2);
         x = vadd(&h2, &x_res);

@@ -1,6 +1,6 @@
 use crate::model::Param;
 
-struct Adam {
+pub(crate) struct Adam {
     lr: f64,
     beta1: f64,
     beta2: f64,
@@ -12,7 +12,7 @@ struct Adam {
 }
 
 impl Adam {
-    fn new(
+    pub(crate) fn new(
         param_count: usize,
         lr: f64,
         beta1: f64,
@@ -32,7 +32,7 @@ impl Adam {
         }
     }
 
-    fn step(&mut self, params: &mut [Param]) {
+    pub(crate) fn step(&mut self, params: &mut [Param]) {
         self.t += 1;
 
         //LR Decay
@@ -51,7 +51,7 @@ impl Adam {
 
             // moment
             self.m[i] = b1 * self.m[i] + (1.0 - b1) * g;
-            self.v[i] = b2 * self.v[i] + (1.0 - b2) * g;
+            self.v[i] = b2 * self.v[i] + (1.0 - b2) * g * g;
 
             // bias correct
             let m_hat = self.m[i] / b1t;

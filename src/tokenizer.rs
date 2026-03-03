@@ -1,13 +1,51 @@
 use std::{
+    collections::BTreeSet,
     fs,
     time::{SystemTime, UNIX_EPOCH},
 };
 
-pub(crate) fn tokenizer() {
+pub(crate) struct TokenizerInfo {
+    pub(crate) docs: Vec<String>,
+    pub(crate) uchars: Vec<char>,
+    pub(crate) bos: usize,
+    pub(crate) vocab_size: usize,
+}
+
+pub(crate) fn tokenizer() -> TokenizerInfo {
     let docs = preprocess_data();
-    let bos = docs.len();
-    let vocab_size = docs.len() + 1;
-    println!("BOS:{bos},vocab size: {vocab_size}")
+
+    let mut set = BTreeSet::new();
+    for d in &docs {
+        for ch in d.chars() {
+            set.insert(ch);
+        }
+    }
+    let uchars: Vec<char> = set.into_iter().collect();
+    let bos = uchars.len();
+    let vocab_size = uchars.len() + 1;
+    println!("BOS:{bos},vocab size: {vocab_size}");
+    TokenizerInfo {
+        docs,
+        uchars,
+        bos,
+        vocab_size,
+    }
+}
+
+pub(crate) fn tokenize_doc(doc: &str, uchars: &[char], bos: usize) -> Vec<usize> {
+    let mut tokens = Vec::with_capacity(doc.len() + 2);
+    // Add BOS at beginning
+    tokens.push(bos);
+
+    for ch in doc.chars() {
+        let tid = uchars
+            .iter()
+            .position(|&c| c == ch)
+            .expect("character not in vocabulary");
+        tokens.push(tid);
+    }
+    tokens.push(bos);
+    tokens
 }
 
 fn preprocess_data() -> Vec<String> {
